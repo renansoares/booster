@@ -1,0 +1,151 @@
+<h1 id='booster-cloud-framework-rest-api'>Booster Cloud Framework REST API</h1>
+<p>The API for a Booster application is very simple and is fully defined by auth endpoints and the <a href="03-commands.md">commands</a>
+and <a href="06-read-models.md">read models</a> names and structures.</p>
+
+<p>After a successful deployment you&#39;ll see an &quot;Outputs:&quot; section in your terminal with several values that you need to use 
+when doing requests to the API. Those values are:</p>
+
+<ul>
+<li><code>baseURL</code>: This is the base URL for all your endpoints</li>
+<li><code>clientID</code>: Needed for authentication/authorization endpoints. This is only shown if there are roles defined in your app.</li>
+</ul>
+
+<p>Note that the <code>Content-Type</code> for all requests is <code>application/json</code>.</p>
+<h2 id='authentication-and-authorization-api'>Authentication and Authorization API</h2>
+<p>The following endpoints are provisioned if your application have at least one role defined. For more information about how 
+to use roles to restrict the access to your application, see the section <a href="07-auth.md">Authentication and Authorization</a>.</p>
+<h3 id='sign-up'>Sign-up</h3>
+<p>Register a user in your application. After a successful invocation, an email will be sent to the user&#39;s inbox
+with a confirmation link. <strong>Users&#39;s won&#39;t be able to sign-in before they click in that link</strong>.</p>
+<h6 id='endpoint'>Endpoint</h6>
+<p><code>http request
+POST https://&lt;baseURL&gt;/auth/sign-up
+</code></p>
+<h6 id='request-body'>Request body</h6><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+    </span><span class="s2">"clientId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"username"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"password"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"userAttributes"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"roles"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"string"</span><span class="p">]</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<ul>
+<li><em>clientId</em>: The application client Id that you got as an output when the application was deployed.</li>
+<li><em>username</em>: The username of the user you want to register. It <strong>must be an email</strong>.</li>
+<li><em>password</em>: The password the user will use to later login into your application and get access tokens.</li>
+<li><em>userAttributes</em>: Here you can specify the attributes of your user. These are:
+
+<ul>
+<li><em>roles</em>: An array of roles this user will have. You can only specify here roles with the property <code>allowSelfSignUp = true</code> </li>
+</ul></li>
+</ul>
+<h6 id='response'>Response</h6>
+<p>An empty body</p>
+<h6 id='errors'>Errors</h6>
+<p>You will get a HTTP status code different from 2XX and a body with a message telling you the reason of the error.
+For example, if you introduce a username that&#39;s not an email, you will get the following response body:
+<code>json
+{
+    &quot;__type&quot;: &quot;InvalidParameterException&quot;,
+    &quot;message&quot;: &quot;Username should be an email.&quot;
+}
+</code></p>
+<h3 id='sign-in'>Sign-in</h3>
+<p>Allows your users to get tokens to be able to make request to restricted endpoints. 
+Remember that before a user can be signed in into your application, <strong>its email must be confirmed</strong></p>
+<h6 id='endpoint-2'>Endpoint</h6>
+<p><code>http request
+POST https://&lt;baseURL&gt;/auth/sign-in
+</code></p>
+<h6 id='request-body-2'>Request body</h6><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+    </span><span class="s2">"clientId"</span><span class="p">:</span><span class="s2">"string"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"username"</span><span class="p">:</span><span class="s2">"string"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"password"</span><span class="p">:</span><span class="s2">"string"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<ul>
+<li><em>clientId</em>: The application client Id that you got as an output when the application was deployed.</li>
+<li><em>username</em>: The username of the user you want to sign in. It must be previously signed up</li>
+<li><em>password</em>: The password used to sign up the user.</li>
+</ul>
+<h6 id='response-2'>Response</h6><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+    </span><span class="s2">"accessToken"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"expiresIn"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"refreshToken"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"tokenType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<ul>
+<li><em>accessToken</em>: The token you can use to access restricted resources. It must be sent in the <code>Authorization</code> header (prefixed with the <code>tokenType</code>)</li>
+<li><em>expiresIn</em>: The period of time, in seconds, after which the token will expire</li>
+<li><em>refreshToken</em>: The token you can use to get a new access token after it has expired.</li>
+<li><em>tokenType</em>: The type of token used. It is always <code>Bearer</code>
+###### Errors
+You will get a HTTP status code different from 2XX and a body with a message telling you the reason of the error.
+For example, if you tried to login a user that has not been confirmed, you will get the following response body:
+<code>json
+{
+&quot;__type&quot;: &quot;UserNotConfirmedException&quot;,
+&quot;message&quot;: &quot;User is not confirmed.&quot;
+}
+</code>
+### Sign-out
+Finalizes the user session by cancelling their tokens.</li>
+</ul>
+<h6 id='endpoint-3'>Endpoint</h6>
+<p><code>http request
+POST https://&lt;baseURL&gt;/auth/sign-out
+</code></p>
+<h6 id='request-body-3'>Request body</h6><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+    </span><span class="s2">"accessToken"</span><span class="p">:</span><span class="s2">"string"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<ul>
+<li><em>accessToken</em>: The access token you get in the sign-in call.</li>
+</ul>
+<h6 id='response-3'>Response</h6>
+<p>An empty body</p>
+<h6 id='errors-2'>Errors</h6>
+<p>You will get a HTTP status code different from 2XX and a body with a message telling you the reason of the error.
+For example, if you specified an in valid access token, you will get the following error:
+<code>json
+{
+    &quot;__type&quot;: &quot;NotAuthorizedException&quot;,
+    &quot;message&quot;: &quot;Invalid Access Token&quot;
+}
+</code></p>
+<h2 id='write-api-commands-submission'>Write API (commands submission)</h2>
+<ul>
+<li>[ ] TODO: Improve this documentation</li>
+</ul>
+
+<p><code>POST https://&lt;baseURL&gt;/commands</code>
+Body:
+<code>json
+{
+  &quot;typeName&quot;: &quot;ChangeCartItem&quot;,
+  &quot;version&quot;: 1,
+  &quot;value&quot;: {
+    &quot;cartId&quot;: &quot;demo&quot;,
+    &quot;sku&quot;: &quot;ABC-10&quot;,
+    &quot;quantity&quot;: 1
+  }
+}
+</code></p>
+<h2 id='read-api-retrieve-a-read-model'>Read API (retrieve a read model)</h2>
+<ul>
+<li>[ ] Improve this documentation</li>
+</ul>
+<h3 id='get-a-list'>Get a list</h3>
+<p><code>GET https://&lt;baseURL&gt;/readmodels/&lt;read model class name&gt;</code></p>
+
+<p>Example:</p>
+
+<p><code>GET https://&lt;baseURL&gt;/readmodels/CartReadModel</code></p>
+<h3 id='get-a-specific-read-model'>Get a specific read model</h3>
+<p><code>GET https://&lt;baseURL&gt;/readmodels/&lt;read model class name&gt;/&lt;read model ID&gt;</code></p>
+
+<p>Example:</p>
+
+<p><code>GET https://&lt;baseURL&gt;/readmodels/CartReadModel/42</code></p>

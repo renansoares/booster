@@ -1,0 +1,38 @@
+<h1 id='deploying'>Deploying</h1>
+<p>One of the goals of Booster is to become provider agnostic so you can deploy your application to any serverless provider like AWS, Google Cloud, Azure, etc...</p>
+
+<p>So far, in the current version, only AWS is supported, but given the high level of abstraction, it will eventually support
+all cloud providers. (<strong>Contributions are welcome!</strong> 😜)</p>
+<h2 id='configure-your-provider-credentials'>Configure your provider credentials</h2>
+<p>In the case of AWS, it is required that your <code>~/.aws/credentials</code> are properly setup, and a <code>region</code> attribute is specified. If you have the <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html">AWS CLI installed</a>, you can create the config file by running the command <code>aws configure</code>, but that is completely optional, <strong>AWS CLI is not required to run booster</strong>. Creating a plain text file manually named <code>~/.aws/credentials</code> with the following content will be enough:</p>
+
+<p><code>shell script
+[default]
+aws_access_key_id = &lt;YOUR KEY ID&gt;
+aws_secret_access_key = &lt;YOUR ACCESS KEY&gt;
+region = eu-west-1
+</code></p>
+
+<p>It&#39;s recomended to use IAM user keys and avoiding your root access keys. If you need help obtaining a <code>KEY ID</code> and <code>ACCESS KEY</code>, <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html#Using_CreateAccessKey">check out the oficial AWS guides</a>.</p>
+<h2 id='deploy-your-project'>Deploy your project</h2>
+<p>To deploy your Booster project, run the following command:</p>
+
+<p><code>shell script
+boost deploy
+</code></p>
+
+<p>It will take a while, but you should have your project deployed to your cloud provider.</p>
+
+<p>If you make changes to your code, you can run <code>boost deploy</code> again to update your project in the cloud.</p>
+<h2 id='deleting-your-cloud-stack'>Deleting your cloud stack</h2>
+<p>If you want to delete the Booster application that has been deployed to the cloud, you can run:</p>
+
+<p><code>shell script
+boost nuke
+</code></p>
+
+<blockquote>
+<p><strong>Note</strong>: This will delete everything in your stack, including databases. This action is <strong>not</strong> reversible!</p>
+</blockquote>
+
+<p>After deploying your application, check out <a href="09-rest-api.md">the API documentation to start using it</a>!</p>

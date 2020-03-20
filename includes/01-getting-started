@@ -1,0 +1,42 @@
+<h1 id='getting-started'>Getting Started</h1>
+<p>Let&#39;s install the Booster CLI and bootstrap your first project:</p>
+
+<ol>
+<li>Install the Booster CLI tool if you haven’t yet:</li>
+</ol>
+
+<p><code>shell script
+   npm install -g @boostercloud/cli
+</code></p>
+
+<ol>
+<li>Create a new Booster project</li>
+</ol>
+
+<p><code>shell script
+   boost new:project &lt;name of your project&gt;
+</code></p>
+
+<ol>
+<li><p>Go to your new project folder (<code>cd &lt;name of your project&gt;</code>) to see the project structure. You&#39;ll see something like this:</p>
+<pre class="highlight plaintext"><code>$ tree
+.
+|____package.json
+|____tsconfig.json
+|____src
+| |____migrations
+| |____config
+| | |____config.ts
+| |____read-models
+| |____commands
+| |____events
+| |____entities
+</code></pre></li>
+</ol>
+
+<p>Project structure or code generators are not enforced, but they&#39;re recommended to build a community-shared set of conventions.</p>
+
+<p>Now that you have an empty project you can:
+- <a href="02-architecture.md">Learn more about the Booster Cloud Framework high-level Architecture</a>
+- <a href="03-commands.md">Start building your write API creating your first Commands</a>
+- <a href="../examples">See code examples and step-by-step guides</a></p>

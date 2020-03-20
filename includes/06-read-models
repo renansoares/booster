@@ -1,0 +1,43 @@
+<h1 id='read-models-the-read-pipeline'>Read Models - The Read Pipeline</h1>
+<p><img src="/images/../img/booster-arch.png" alt="Booster architecture" /></p>
+
+<p>Read Models are cached data optimized for read operations and they&#39;re updated reactively when <a href="05-entities.md">Entities</a> are updated by new <a href="04-events.md">events</a>. They also define the <em>Read</em> API, the available REST endpoints and their structure.</p>
+
+<p>Read Models are classes decorated with the <code>@ReadModel</code> decorator that have one or more projection methods. A Projection is a method decorated with the <code>@Projection</code> decorator that, given a new entity value and (optionally) a previous read model state, generate a new read model value.</p>
+
+<p>Read models can be projected from multiple <a href="05-entities.md">entities</a> as soon as they share some common key called <code>joinKey</code>.</p>
+
+<blockquote>
+<p>TODO: (Not in the current release) To generate a Read Model you can use a read model generator. It works similarly than the entities generator:</p>
+
+<p><code>shell script
+boost new:read-model &lt;name of the read model class&gt; --fields fieldName:fieldType --projects EntityOne EntityTwo
+</code></p>
+
+<p>Using the generator will generate a class with the following structure in <code>src/read-models/&lt;name-of-the-read-model&gt;.ts</code>. For instance:</p>
+
+<p><code>shell script
+boost new:read-model CartReadModel --fields id:UUID cartItems:&quot;Array&lt;CartItem&gt;&quot; paid:boolean --projects Cart
+</code></p>
+</blockquote>
+
+<p>Will generate a class with the following structure:</p>
+<pre class="highlight typescript tab-typescript"><code><span class="p">@</span><span class="nd">ReadModel</span>
+<span class="k">export</span> <span class="kr">class</span> <span class="nx">CartReadModel</span> <span class="p">{</span>
+  <span class="k">public</span> <span class="kd">constructor</span><span class="p">(</span>
+    <span class="k">readonly</span> <span class="nx">id</span><span class="p">:</span> <span class="nx">UUID</span><span class="p">,</span>
+    <span class="k">readonly</span> <span class="nx">cartItems</span><span class="p">:</span> <span class="nb">Array</span><span class="o">&lt;</span><span class="nx">CartItem</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="k">public</span> <span class="nx">paid</span><span class="p">:</span> <span class="kr">boolean</span>
+  <span class="p">)</span> <span class="p">{}</span>
+
+  <span class="p">@</span><span class="nd">Projection</span><span class="p">(</span><span class="nx">Cart</span><span class="p">,</span> <span class="s1">'id'</span><span class="p">)</span>
+  <span class="k">public</span> <span class="k">static</span> <span class="nx">updateWithCart</span><span class="p">(</span><span class="nx">cart</span><span class="p">:</span> <span class="nx">Cart</span><span class="p">,</span> <span class="nx">oldCartReadModel</span><span class="p">?:</span> <span class="nx">CartReadModel</span><span class="p">):</span> <span class="nx">CartReadModel</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nx">CartReadModel</span><span class="p">(</span><span class="nx">cart</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="nx">cart</span><span class="p">.</span><span class="nx">cartItems</span><span class="p">,</span> <span class="nx">cart</span><span class="p">.</span><span class="nx">paid</span><span class="p">)</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<p>Read Model classes can also be created by hand and there are no restrictions regarding the place you put the files. The structure of the data is totally open and can be as complex as you can manage in your projection functions.</p>
+
+<p>Defining a read models enables a new REST Read endpoint that you can use to query or poll the read model records <a href="09-rest-api.md">see the API documentation</a>.</p>
+
+<p>Continue reading about <a href="07-auth.md">Authentication and Authorization</a>!</p>

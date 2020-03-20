@@ -1,0 +1,38 @@
+<h1 id='events'>Events</h1>
+<p><img src="/images/../img/booster-arch.png" alt="Booster architecture" /></p>
+
+<p>An event is a data structure that represents a <strong>fact</strong> and is the source of truth for your application. Instead of mutating your database, you store an event representing that mutation. Think of your bank account, instead of storing your balance in some database table, mutating the value every time you perform an operation, it stores events for each of them. The balance is then calculated on the fly and shown to you any time you request it. Two examples of events in your bank account would be:</p>
+
+<ul>
+<li><code>WithdrawMoney</code></li>
+<li><code>DepositMoney</code></li>
+</ul>
+
+<blockquote>
+<p><em>TODO: (Event handlers are not implemented yet) Events can have handlers attached that allow the system to react to them. Imagine that a specific event represents that your account has reached zero. You can make the handler fire a <a href="03-commands.md">command</a> to notify the user by email.</em></p>
+</blockquote>
+
+<p>To create an event class, you can do the same thing that you did with a command, either manually,
+or with the <code>boost</code> command line tool:</p>
+
+<p><code>shell script
+boost new:event &lt;name of the event&gt; --fields fieldName:fieldType
+</code></p>
+
+<p>Booster will generate a class for you in the <code>src/events</code> folder:</p>
+<pre class="highlight typescript tab-typescript"><code><span class="p">@</span><span class="nd">Event</span>
+<span class="k">export</span> <span class="kr">class</span> <span class="nx">CartPaid</span> <span class="p">{</span>
+  <span class="k">public</span> <span class="kd">constructor</span><span class="p">(</span><span class="k">readonly</span> <span class="nx">cartID</span><span class="p">:</span> <span class="nx">UUID</span><span class="p">,</span> <span class="k">readonly</span> <span class="nx">confirmationToken</span><span class="p">:</span> <span class="kr">string</span><span class="p">)</span> <span class="p">{}</span>
+
+  <span class="k">public</span> <span class="nx">entityID</span><span class="p">():</span> <span class="nx">UUID</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">cartId</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<p>Notice the required <code>entityID</code> method. All events are grouped by their event type and the value returned by <code>entityID</code>. All events are somehow tied to a concept in your domain model, in our bank account example, this could be the account number.</p>
+
+<p>In the previous example, the <code>CartPaid</code> event has a <code>cartID</code> field, which then you will return in the <code>entityID</code> method. This allows booster to find this event when the system requests to build the state of a specific Cart.</p>
+
+<p>In most situations your event stream will be reduced to a domain model object, like that Cart (An <a href="05-entities.md">Entity</a>), but there are some use cases on which the event stream is just related to a specific entity, for example, a register of sensor values in a weather station, which are related to the station, but the station has no specific value that needs to be reduced. You can implement the semantics that best suit your needs.</p>
+
+<p>Let&#39;s continue learning about <a href="05-entities.md">Entities</a>!</p>

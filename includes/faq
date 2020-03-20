@@ -1,0 +1,9 @@
+<h1 id='frequently-asked-questions'>Frequently asked questions</h1>
+<p><strong>1.- When deploying my application in AWS for the first time, I got an error saying <em>&quot;StagingBucket <your app name>-toolkit-bucket already exists&quot;</em></strong></p>
+
+<p>When you deploy a Booster application to AWS, an S3 bucket needs to be created to upload the application code. Booster names that bucket
+using your application name as a prefix. 
+In AWS, bucket names must be unique <em>globally</em>, so if there is another bucket in the world with exactly the same name as
+the one generated for your application, you will get this error.  </p>
+
+<p>The solution is to change your application name in the configuration file so that the bucket name is unique. </p>

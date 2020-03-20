@@ -1,0 +1,78 @@
+<h1 id='entities'>Entities</h1>
+<p><img src="/images/../img/booster-arch.png" alt="Booster architecture" /></p>
+
+<p>Entities are not shown in the diagram because they&#39;re just a different view of the data in the events store.</p>
+
+<p>Entities represent domain model objects, that is, something that can be mapped to an object with semantics in your domain. Entities only exist conceptually, they&#39;re not explicitly stored in any database, but generated on the fly from a list of related <a href="04-events.md">events</a>.</p>
+
+<p>Booster creates snapshots of the entities automatically under the hoods to reduce access times, but the developer doesn&#39;t has to worry about that.</p>
+
+<p>Examples of entities are:</p>
+
+<ul>
+<li>A Cart</li>
+<li>An Account</li>
+<li>A User</li>
+</ul>
+
+<p>To create an entity... You guessed it! We use the <code>boost</code> tool:</p>
+
+<p><code>shell script
+boost new:entity &lt;name of the entity&gt; --fields fieldName:fieldType --reduces EventOne EventTwo EventThree
+</code></p>
+
+<p>For instance, running the following command:</p>
+
+<p><code>shell script
+boost new:entity Order --fields shippingAddress:Address orderItems:&quot;Array&lt;OrderItem&gt;&quot; --reduces OrderCreated
+</code></p>
+
+<p>will generate a class in the <code>src/entities</code> folder with the following structure:</p>
+<pre class="highlight typescript tab-typescript"><code><span class="p">@</span><span class="nd">Entity</span>
+<span class="k">export</span> <span class="kr">class</span> <span class="nx">Order</span> <span class="p">{</span>
+  <span class="k">public</span> <span class="kd">constructor</span><span class="p">(</span><span class="k">readonly</span> <span class="nx">id</span><span class="p">:</span> <span class="nx">UUID</span><span class="p">,</span> <span class="k">readonly</span> <span class="nx">shippingAddress</span><span class="p">:</span> <span class="nx">Address</span><span class="p">,</span> <span class="k">readonly</span> <span class="nx">orderItems</span><span class="p">:</span> <span class="nb">Array</span><span class="o">&lt;</span><span class="nx">OrderItem</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">{}</span>
+
+  <span class="p">@</span><span class="nd">Reduces</span><span class="p">(</span><span class="nx">OrderCreated</span><span class="p">)</span>
+  <span class="k">public</span> <span class="k">static</span> <span class="nx">createOrder</span><span class="p">(</span><span class="nx">event</span><span class="p">:</span> <span class="nx">OrderCreated</span><span class="p">,</span> <span class="nx">previousOrder</span><span class="p">?:</span> <span class="nx">Order</span><span class="p">):</span> <span class="nx">Order</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">event</span><span class="p">.</span><span class="nx">order</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<p>As you can see, entities are also regular TypeScript classes, like the rest of the Booster artifacts.</p>
+
+<p>Take a look, entities have a special <strong>reducer function</strong> decorated with <code>@Reduces</code>,
+that will be triggered each time that a specific kind of event is generated.</p>
+
+<p>All projection functions receive:</p>
+
+<ul>
+<li>The event</li>
+<li>A possible previous state (note the <code>?</code> meaning that there could be no previous state. i.e. when the app is just starting)</li>
+</ul>
+
+<p>And it <strong>always</strong> must return a new entity. This function <strong>must be pure</strong>, which means that it cannot perform any side effects, only create a new object based on some conditions on the input data, and then return it.</p>
+<h2 id='reading-entity-quot-state-quot'>Reading Entity &quot;state&quot;</h2>
+<p>Booster provides a handy <code>fetchEntitySnapshot</code> method to check the value of an entity from any handler method in order to make domain-driven decisions:</p>
+<pre class="highlight typescript tab-typescript"><code><span class="p">@</span><span class="nd">Command</span><span class="p">({</span>
+  <span class="na">authorize</span><span class="p">:</span> <span class="s1">'all'</span><span class="p">,</span>
+<span class="p">})</span>
+<span class="k">export</span> <span class="kr">class</span> <span class="nx">MoveStock</span> <span class="p">{</span>
+  <span class="k">public</span> <span class="kd">constructor</span><span class="p">(</span><span class="k">readonly</span> <span class="nx">productSKU</span><span class="p">:</span> <span class="nx">UUID</span><span class="p">,</span> <span class="k">readonly</span> <span class="nx">fromLocationId</span><span class="p">:</span> <span class="nx">UUID</span><span class="p">,</span> <span class="k">readonly</span> <span class="nx">toLocationId</span><span class="p">:</span> <span class="nx">UUID</span><span class="p">,</span> <span class="k">readonly</span> <span class="nx">quantity</span><span class="p">:</span> <span class="kr">number</span><span class="p">)</span> <span class="p">{}</span>
+
+  <span class="k">public</span> <span class="nx">handle</span><span class="p">(</span><span class="nx">register</span><span class="p">:</span> <span class="nx">Register</span><span class="p">):</span> <span class="k">void</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">productStock</span> <span class="o">=</span> <span class="nx">fetchEntitySnapshot</span><span class="p">(</span><span class="s1">'ProductStock'</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">productSKU</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">productStock</span><span class="p">.</span><span class="nx">locations</span><span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">fromLocationId</span><span class="p">].</span><span class="nx">count</span> <span class="o">&gt;=</span> <span class="k">this</span><span class="p">.</span><span class="nx">quantity</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// Enough stock, we confirm the movement</span>
+      <span class="nx">register</span><span class="p">.</span><span class="nx">events</span><span class="p">(</span><span class="k">new</span> <span class="nx">StockMovement</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">productSKU</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">fromLocationId</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">toLocationID</span><span class="p">,</span> <span class="nx">quantity</span><span class="p">))</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="c1">// Not enough stock, we register this fact</span>
+      <span class="nx">register</span><span class="p">.</span><span class="nx">events</span><span class="p">(</span><span class="k">new</span> <span class="nx">FailedCommand</span><span class="p">({</span>
+        <span class="na">command</span><span class="p">:</span> <span class="k">this</span><span class="p">,</span>
+        <span class="na">reason</span><span class="p">:</span> <span class="s2">`Not enough stock in origin location`</span>
+      <span class="p">))</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<p>Continue reading about <a href="06-read-models.md">Read Models</a>!</p>

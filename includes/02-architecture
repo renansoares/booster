@@ -1,0 +1,33 @@
+<h1 id='architecture-and-core-concepts'>Architecture and core concepts</h1>
+<p>Booster’s architecture is heavily inspired by the <a href="https://www.martinfowler.com/bliki/CQRS.html">CQRS</a> and <a href="https://martinfowler.com/eaaDev/EventSourcing.html">Event Sourcing</a> patterns.
+These patterns have proven to work well for highly-distributed high available systems, being a tool to make resilient
+software that is fast and scales very well, especially in distributed scenarios.</p>
+
+<p>With these patterns combined, in a Booster Application:</p>
+
+<ul>
+<li>The write operations are separated from the read operations (called <a href="03-commands.md"><em>commands</em></a> and <a href="04-read-models.md"><em>queries</em></a>, respectively) and dependencies are limited to data.</li>
+<li>Instead of storing and mutating the data in a single database, Booster stores the state as a virtually infinite append-only list of events (think of your bank account, where all the movements are stored as individual movements).</li>
+<li>The event stream is the system source of truth, and the &quot;current state&quot; can be queried anytime reducing it on the fly as <a href="05-entities.md">entities</a>.</li>
+</ul>
+
+<p>This architecture has many advantages:</p>
+
+<ul>
+<li>The whole architecture is designed for high availability and eventual consistency.</li>
+<li>The code is much easier to change because dependencies between modules is limited.</li>
+<li>Old code can live with new code without affecting each other, so it&#39;s easier to smoothly test and introduce new features.</li>
+<li>System boundaries are clearly defined and are easy to maintain.</li>
+</ul>
+
+<p>It&#39;s usually non-trivial to get event-driven architecture design right and implement a maintainable event-driven solution that scales, but Booster has been built around these concepts and will greatly help you and your team to keep things under control. Booster integrates event-driven design in a way that simplifies their usage and understanding.</p>
+
+<p>The Booster high-level architecture diagram looks like this:</p>
+
+<p><img src="/images/../img/booster-arch.png" alt="Booster architecture" /></p>
+
+<p>Learn more about each topic in the corresponding sections:
+- <a href="03-commands.md">Commands</a>: The entry point of your application (Write API).
+- <a href="04-events.md">Events</a>: The source of truth of your application.
+- <a href="05-entities.md">Entities</a>: The domain model of your application.
+- <a href="06-read-models.md">Read Models</a>: Highly optimized Read API</p>
