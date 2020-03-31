@@ -229,6 +229,11 @@
           </li>
           <li>
             <a href="#events" class="toc-h1 toc-link" data-title="Events">Events</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#event-handlers" class="toc-h2 toc-link" data-title="Event Handlers">Event Handlers</a>
+                  </li>
+              </ul>
           </li>
           <li>
             <a href="#entities" class="toc-h1 toc-link" data-title="Entities">Entities</a>
@@ -322,8 +327,8 @@
 <p>Project structure or code generators are not enforced, but they&#39;re recommended to build a community-shared set of conventions.</p>
 
 <p>Now that you have an empty project you can:
-- <a href="02-architecture.md">Learn more about the Booster Cloud Framework high-level Architecture</a>
-- <a href="03-commands.md">Start building your write API creating your first Commands</a>
+- <a href="_02-architecture.md">Learn more about the Booster Cloud Framework high-level Architecture</a>
+- <a href="_03-commands.md">Start building your write API creating your first Commands</a>
 - <a href="../examples">See code examples and step-by-step guides</a></p>
 <h1 id='architecture-and-core-concepts'>Architecture and core concepts</h1>
 <p>Booster’s architecture is heavily inspired by the <a href="https://www.martinfowler.com/bliki/CQRS.html">CQRS</a> and <a href="https://martinfowler.com/eaaDev/EventSourcing.html">Event Sourcing</a> patterns.
@@ -333,17 +338,17 @@ software that is fast and scales very well, especially in distributed scenarios.
 <p>With these patterns combined, in a Booster Application:</p>
 
 <ul>
-<li>The write operations are separated from the read operations (called <a href="03-commands.md"><em>commands</em></a> and <a href="04-read-models.md"><em>queries</em></a>, respectively) and dependencies are limited to data.</li>
-<li>Instead of storing and mutating the data in a single database, Booster stores the state as a virtually infinite append-only list of events (think of your bank account, where all the movements are stored as individual movements).</li>
-<li>The event stream is the system source of truth, and the &quot;current state&quot; can be queried anytime reducing it on the fly as <a href="05-entities.md">entities</a>.</li>
+<li>The <em>write operations</em> are separated from the <em>read operations</em> (called <a href="_03-commands.md"><em>commands</em></a> and <a href="_04-read-models.md"><em>queries</em></a>, respectively) and dependencies are limited to data.</li>
+<li>Instead of storing and mutating the data in a single stateful database, Booster stores the state as a virtually infinite append-only list of events (think of your bank account, where all the movements are stored as individual movements).</li>
+<li>The event stream is the system source of truth, and the &quot;current state&quot; can be queried anytime reducing it on the fly as <a href="_05-entities.md">entities</a>.</li>
 </ul>
 
 <p>This architecture has many advantages:</p>
 
 <ul>
 <li>The whole architecture is designed for high availability and eventual consistency.</li>
-<li>The code is much easier to change because dependencies between modules is limited.</li>
-<li>Old code can live with new code without affecting each other, so it&#39;s easier to smoothly test and introduce new features.</li>
+<li>The code is much easier to change because modules are loosely coupled.</li>
+<li>Old code can live along with new code without affecting each other, so it&#39;s easier to smoothly test and introduce new features.</li>
 <li>System boundaries are clearly defined and are easy to maintain.</li>
 </ul>
 
@@ -354,26 +359,26 @@ software that is fast and scales very well, especially in distributed scenarios.
 <p><img src="img/booster-arch.png" alt="Booster architecture" /></p>
 
 <p>Learn more about each topic in the corresponding sections:
-- <a href="03-commands.md">Commands</a>: The entry point of your application (Write API).
-- <a href="04-events.md">Events</a>: The source of truth of your application.
-- <a href="05-entities.md">Entities</a>: The domain model of your application.
-- <a href="06-read-models.md">Read Models</a>: Highly optimized Read API</p>
+- <a href="_03-commands.md">Commands</a>: The entry point of your application (Write API).
+- <a href="_04-events.md">Events</a>: The source of truth of your application.
+- <a href="_05-entities.md">Entities</a>: The domain model of your application.
+- <a href="_06-read-models.md">Read Models</a>: Highly optimized Read API</p>
 <h1 id='commands-and-command-handlers-the-write-pipeline'>Commands and Command Handlers - The Write Pipeline</h1>
 <p><img src="img/booster-arch.png" alt="Booster architecture" /></p>
 
-<p>Commands and Command Handlers define the <strong>write</strong> API of your application (highlighted in yellow in the diagram). Commands are objects that are sent to the <code>/commands</code> endpoint. The usage of this endpoint is explained <a href="09-rest-api.md">in the REST API section</a>.</p>
+<p>Commands and Command Handlers define the <strong>write</strong> API of your application (highlighted in yellow in the diagram). Commands are objects that are sent to the <code>/commands</code> endpoint. The usage of this endpoint is explained <a href="_09-rest-api.md">in the REST API section</a>.</p>
 
-<p>Instead of a controller, like in a traditional architecture like <a href="https://www.martinfowler.com/eaaCatalog/modelViewController.html">MVC</a>, you define a <em>Handler</em> method, which will be in charge of processing the command, calling any third-party services, performing side-effects, and finally, registering <a href="04-events.md">events</a>.</p>
+<p>Similarly to controllers in a traditional <a href="https://www.martinfowler.com/eaaCatalog/modelViewController.html">MVC</a> architecture, commands are synchronously dispatched by a <em>handler</em> method, which will be in charge of validating the input and registering one or more <a href="_04-events.md">events</a> in the system. While command handlers can run arbitrary code, it is recommended to keep them small, focusing on data acceptance and delegating as much logic to <a href="_04-events.md">event handlers</a>.</p>
 
 <blockquote>
 <p><strong>Note:</strong> Event registration is not mandatory, but we <strong>strongly</strong> recommend registering at least one event for any possible final state, even in the case of a failure, to make your application activity easier to trace and debug.</p>
 </blockquote>
 
 <p>A command is a class, decorated with the <code>@Command</code> decorator, that defines a data structure
-and a handler method. The method will process the commands and optionally generate and persist
+and a <code>handle</code> method. The method will process the commands and optionally generate and persist
 one or more events to the event store.</p>
 
-<p>To create a command, you can do so manually, or by running the generator provided by the <code>boost</code> CLI tool. Let&#39;s create a command to confirm a payment:</p>
+<p>You can create a command manually or using the generator provided with the <code>boost</code> CLI tool. Let&#39;s create a command to confirm a payment:</p>
 
 <p><code>shell script
 boost new:command ConfirmPayment --fields cartID:UUID confirmationToken:string
@@ -387,24 +392,15 @@ boost new:command ConfirmPayment --fields cartID:UUID confirmationToken:string
   <span class="k">public</span> <span class="kd">constructor</span><span class="p">(</span><span class="k">readonly</span> <span class="nx">cartID</span><span class="p">:</span> <span class="nx">UUID</span><span class="p">,</span> <span class="k">readonly</span> <span class="nx">confirmationToken</span><span class="p">:</span> <span class="kr">string</span><span class="p">)</span> <span class="p">{}</span>
 
   <span class="k">public</span> <span class="nx">handle</span><span class="p">(</span><span class="nx">register</span><span class="p">:</span> <span class="nx">Register</span><span class="p">):</span> <span class="k">void</span> <span class="p">{</span>
-    <span class="c1">// implementation for the handler</span>
+    <span class="c1">// The `register` parameter injected can be used to register any number of events.</span>
+    <span class="nx">register</span><span class="p">.</span><span class="nx">events</span><span class="p">(</span><span class="k">new</span> <span class="nx">CartPaid</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">cartId</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">confirmationToken</span><span class="p">))</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
-<p>The <code>handle</code> method is the Handler we were talking about some paragraphs ago. Here you can write arbitrary code like integration with 3rd party services, data validation, and any other side effect that your application requires.</p>
+<p>Note how no magic happened in the generator. The only thing that required for Booster to know that this class is a
+command, is the <code>@Command</code> decorator. You could get the same result by writing the class yourself 😉</p>
 
-<p>Again, we strongly advise that after a command has been executed, even if it didn’t succeed, you <code>register</code> an event
-specifying what happened. This also goes in the <code>handle</code> method, and that’s what the <code>register</code> parameter is used for:</p>
-<pre class="highlight typescript tab-typescript"><code><span class="k">public</span> <span class="nx">handle</span><span class="p">(</span><span class="nx">register</span><span class="p">:</span> <span class="nx">Register</span><span class="p">):</span> <span class="k">void</span> <span class="p">{</span>
-  <span class="c1">// i.e. code that performs a payment</span>
-  <span class="nx">register</span><span class="p">.</span><span class="nx">events</span><span class="p">(</span><span class="k">new</span> <span class="nx">CartPaid</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">cartId</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">confirmationToken</span><span class="p">))</span>
-<span class="p">}</span>
-</code></pre>
-<p>Note how no magic happened here yet. The only thing that is needed for Booster to know that this class is a
-command, is the <code>@Command</code> decorator. Apart from that, the generator only writes code, nothing else!
-You could achieve the same result by writing the class yourself 😉</p>
-
-<p>Continue reading about <a href="04-events.md">Events</a>!</p>
+<p>Continue reading about <a href="_04events.md">Events</a>!</p>
 <h1 id='events'>Events</h1>
 <p><img src="img/booster-arch.png" alt="Booster architecture" /></p>
 
@@ -415,12 +411,10 @@ You could achieve the same result by writing the class yourself 😉</p>
 <li><code>DepositMoney</code></li>
 </ul>
 
-<blockquote>
-<p><em>TODO: (Event handlers are not implemented yet) Events can have handlers attached that allow the system to react to them. Imagine that a specific event represents that your account has reached zero. You can make the handler fire a <a href="03-commands.md">command</a> to notify the user by email.</em></p>
-</blockquote>
+<p>You can define as many event handler classes as you want to react to them. For example, imagine that a specific event represents that your account has reached zero. You can write a handler to notify the user by email. In a Booster application, it is recommended to write most your domain logic in event handlers.</p>
 
 <p>To create an event class, you can do the same thing that you did with a command, either manually,
-or with the <code>boost</code> command line tool:</p>
+or with the generator, using the <code>boost</code> command line tool:</p>
 
 <p><code>shell script
 boost new:event &lt;name of the event&gt; --fields fieldName:fieldType
@@ -440,15 +434,23 @@ boost new:event &lt;name of the event&gt; --fields fieldName:fieldType
 
 <p>In the previous example, the <code>CartPaid</code> event has a <code>cartID</code> field, which then you will return in the <code>entityID</code> method. This allows booster to find this event when the system requests to build the state of a specific Cart.</p>
 
-<p>In most situations your event stream will be reduced to a domain model object, like that Cart (An <a href="05-entities.md">Entity</a>), but there are some use cases on which the event stream is just related to a specific entity, for example, a register of sensor values in a weather station, which are related to the station, but the station has no specific value that needs to be reduced. You can implement the semantics that best suit your needs.</p>
-
-<p>Let&#39;s continue learning about <a href="05-entities.md">Entities</a>!</p>
+<p>In most situations your event stream will be reduced to a domain model object, like that Cart (An <a href="_05entities.md">Entity</a>), but there are some use cases on which the event stream is just related to a specific entity, for example, a register of sensor values in a weather station, which are related to the station, but the station has no specific value that needs to be reduced. You can implement the semantics that best suit your needs.</p>
+<h2 id='event-handlers'>Event Handlers</h2>
+<p>You can react to events implementing an <strong>Event Handler</strong> class. An Event Handler is a regular class that is subscribed to an event with the decorator <code>@EventHandler(&lt;name of the event class&gt;</code>. Any time that a new event is added to the event store, the <code>handle</code> method in the event handler will be called with the instance of the event and the <code>register</code> object that can be used to emit new events. Event handlers can run arbitrary code and is where it is recommended to write most of the business logic in a reactive way:</p>
+<pre class="highlight typescript tab-typescript"><code><span class="p">@</span><span class="nd">EventHandler</span><span class="p">(</span><span class="nx">CartPaid</span><span class="p">)</span>
+<span class="k">export</span> <span class="kr">class</span> <span class="nx">CartPaidHandler</span> <span class="p">{</span>
+  <span class="k">public</span> <span class="k">static</span> <span class="nx">handle</span><span class="p">(</span><span class="nx">event</span><span class="p">:</span> <span class="nx">CartPaid</span><span class="p">,</span> <span class="nx">register</span><span class="p">:</span> <span class="nx">Register</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">register</span><span class="p">.</span><span class="nx">events</span><span class="p">(</span><span class="k">new</span> <span class="nx">OrderPreparationStarted</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">cartID</span><span class="p">))</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<p>Let&#39;s continue learning about <a href="_05entities.md">Entities</a>!</p>
 <h1 id='entities'>Entities</h1>
 <p><img src="img/booster-arch.png" alt="Booster architecture" /></p>
 
 <p>Entities are not shown in the diagram because they&#39;re just a different view of the data in the events store.</p>
 
-<p>Entities represent domain model objects, that is, something that can be mapped to an object with semantics in your domain. Entities only exist conceptually, they&#39;re not explicitly stored in any database, but generated on the fly from a list of related <a href="04-events.md">events</a>.</p>
+<p>Entities represent domain model objects, that is, something that can be mapped to an object with semantics in your domain. Entities only exist conceptually, they&#39;re not explicitly stored in any database, but generated on the fly from a list of related <a href="_04events.md">events</a>.</p>
 
 <p>Booster creates snapshots of the entities automatically under the hoods to reduce access times, but the developer doesn&#39;t has to worry about that.</p>
 
@@ -520,15 +522,15 @@ that will be triggered each time that a specific kind of event is generated.</p>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
-<p>Continue reading about <a href="06-read-models.md">Read Models</a>!</p>
+<p>Continue reading about <a href="_06read-models.md">Read Models</a>!</p>
 <h1 id='read-models-the-read-pipeline'>Read Models - The Read Pipeline</h1>
 <p><img src="img/booster-arch.png" alt="Booster architecture" /></p>
 
-<p>Read Models are cached data optimized for read operations and they&#39;re updated reactively when <a href="05-entities.md">Entities</a> are updated by new <a href="04-events.md">events</a>. They also define the <em>Read</em> API, the available REST endpoints and their structure.</p>
+<p>Read Models are cached data optimized for read operations and they&#39;re updated reactively when <a href="_05entities.md">Entities</a> are updated by new <a href="_04events.md">events</a>. They also define the <em>Read</em> API, the available REST endpoints and their structure.</p>
 
 <p>Read Models are classes decorated with the <code>@ReadModel</code> decorator that have one or more projection methods. A Projection is a method decorated with the <code>@Projection</code> decorator that, given a new entity value and (optionally) a previous read model state, generate a new read model value.</p>
 
-<p>Read models can be projected from multiple <a href="05-entities.md">entities</a> as soon as they share some common key called <code>joinKey</code>.</p>
+<p>Read models can be projected from multiple <a href="_05entities.md">entities</a> as soon as they share some common key called <code>joinKey</code>.</p>
 
 <blockquote>
 <p>TODO: (Not in the current release) To generate a Read Model you can use a read model generator. It works similarly than the entities generator:</p>
@@ -561,9 +563,9 @@ boost new:read-model CartReadModel --fields id:UUID cartItems:&quot;Array&lt;Car
 </code></pre>
 <p>Read Model classes can also be created by hand and there are no restrictions regarding the place you put the files. The structure of the data is totally open and can be as complex as you can manage in your projection functions.</p>
 
-<p>Defining a read models enables a new REST Read endpoint that you can use to query or poll the read model records <a href="09-rest-api.md">see the API documentation</a>.</p>
+<p>Defining a read models enables a new REST Read endpoint that you can use to query or poll the read model records <a href="_09rest-api.md">see the API documentation</a>.</p>
 
-<p>Continue reading about <a href="07-auth.md">Authentication and Authorization</a>!</p>
+<p>Continue reading about <a href="_07auth.md">Authentication and Authorization</a>!</p>
 <h1 id='authentication-and-authorization'>Authentication and Authorization</h1>
 <p>Authorization in Booster is done through roles. Every Command (and in the future, every ReadModel)
 has an <code>authorize</code> policy that tells Booster who can execute or access it. The policy is specified in the
@@ -613,13 +615,13 @@ The latter has this attribute set to <code>true</code>, which means that any use
 <p>If your Booster application has roles defined, an authentication API will be provisioned. It will allow your users to gain
 access to your resources.</p>
 
-<p>This API consists of three endpoints (<a href="09-rest-api.md">see the API documentation</a>):</p>
+<p>This API consists of three endpoints (<a href="_09rest-api.md">see the API documentation</a>):</p>
 
 <ul>
 <li><code>/auth/sign-up</code>: Users can use this endpoint to register in your application and get some roles assigned to them.
 Only roles with the attribute <code>allowSelfSignUp: true</code> can be specified upon sign-up. After calling this endpoint, the
 registration is not yet finished. Users need to confirm their emails by clicking in the link that will be sent to their
-inbox. </li>
+inbox.</li>
 </ul>
 
 <p><img src="img/sign-up-verificaiton-email.png" alt="Confirmation email" /> <img src="img/sign-up-confirmed.png" alt="Email confirmed" />
@@ -631,7 +633,7 @@ inbox. </li>
 Bearer Authorization header (<code>Authorization: Bearer</code>). It will be used to get the user information and
 authorize it to access protected resources.</p>
 
-<p>Continue reading about <a href="08-deployment.md">how to deploy your application</a></p>
+<p>Continue reading about <a href="_08deployment.md">how to deploy your application</a></p>
 <h1 id='deploying'>Deploying</h1>
 <p>One of the goals of Booster is to become provider agnostic so you can deploy your application to any serverless provider like AWS, Google Cloud, Azure, etc...</p>
 
@@ -669,12 +671,12 @@ boost nuke
 <p><strong>Note</strong>: This will delete everything in your stack, including databases. This action is <strong>not</strong> reversible!</p>
 </blockquote>
 
-<p>After deploying your application, check out <a href="09-rest-api.md">the API documentation to start using it</a>!</p>
+<p>After deploying your application, check out <a href="_09rest-api.md">the API documentation to start using it</a>!</p>
 <h1 id='booster-cloud-framework-rest-api'>Booster Cloud Framework REST API</h1>
-<p>The API for a Booster application is very simple and is fully defined by auth endpoints and the <a href="03-commands.md">commands</a>
-and <a href="06-read-models.md">read models</a> names and structures.</p>
+<p>The API for a Booster application is very simple and is fully defined by auth endpoints and the <a href="_03commands.md">commands</a>
+and <a href="_06read-models.md">read models</a> names and structures.</p>
 
-<p>After a successful deployment you&#39;ll see an &quot;Outputs:&quot; section in your terminal with several values that you need to use 
+<p>After a successful deployment you&#39;ll see an &quot;Outputs:&quot; section in your terminal with several values that you need to use
 when doing requests to the API. Those values are:</p>
 
 <ul>
@@ -684,8 +686,8 @@ when doing requests to the API. Those values are:</p>
 
 <p>Note that the <code>Content-Type</code> for all requests is <code>application/json</code>.</p>
 <h2 id='authentication-and-authorization-api'>Authentication and Authorization API</h2>
-<p>The following endpoints are provisioned if your application have at least one role defined. For more information about how 
-to use roles to restrict the access to your application, see the section <a href="07-auth.md">Authentication and Authorization</a>.</p>
+<p>The following endpoints are provisioned if your application have at least one role defined. For more information about how
+to use roles to restrict the access to your application, see the section <a href="_07auth.md">Authentication and Authorization</a>.</p>
 <h3 id='sign-up'>Sign-up</h3>
 <p>Register a user in your application. After a successful invocation, an email will be sent to the user&#39;s inbox
 with a confirmation link. <strong>Users&#39;s won&#39;t be able to sign-in before they click in that link</strong>.</p>
@@ -709,7 +711,7 @@ POST https://&lt;baseURL&gt;/auth/sign-up
 <li><em>userAttributes</em>: Here you can specify the attributes of your user. These are:
 
 <ul>
-<li><em>roles</em>: An array of roles this user will have. You can only specify here roles with the property <code>allowSelfSignUp = true</code> </li>
+<li><em>roles</em>: An array of roles this user will have. You can only specify here roles with the property <code>allowSelfSignUp = true</code></li>
 </ul></li>
 </ul>
 <h6 id='response'>Response</h6>
@@ -724,7 +726,7 @@ For example, if you introduce a username that&#39;s not an email, you will get t
 }
 </code></p>
 <h3 id='sign-in'>Sign-in</h3>
-<p>Allows your users to get tokens to be able to make request to restricted endpoints. 
+<p>Allows your users to get tokens to be able to make request to restricted endpoints.
 Remember that before a user can be signed in into your application, <strong>its email must be confirmed</strong></p>
 <h6 id='endpoint-2'>Endpoint</h6>
 <p><code>http request
