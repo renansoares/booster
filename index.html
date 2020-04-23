@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>Booster documentation</title>
+    <title>Booster Framework Docs</title>
 
     <style>
       .highlight table td { padding: 5px; }
@@ -196,12 +196,12 @@
   color: #f92672;
 }
     </style>
-    <link href="stylesheets/screen-a1ce949a.css" rel="stylesheet" media="screen" />
+    <link href="stylesheets/screen-054045c6.css" rel="stylesheet" media="screen" />
     <link href="stylesheets/print-bccf8c07.css" rel="stylesheet" media="print" />
-      <script src="javascripts/all-c5541673.js"></script>
+      <script src="javascripts/all_nosearch-c275c2f6.js"></script>
   </head>
 
-  <body class="index" data-languages="[&quot;typescript&quot;]">
+  <body class="index" data-languages="[]">
     <a href="#" id="nav-button">
       <span>
         NAV
@@ -209,14 +209,7 @@
       </span>
     </a>
     <div class="toc-wrapper">
-      <img src="images/logo-1e815a84.png" class="logo" alt="Logo" />
-        <div class="lang-selector">
-              <a href="#" data-language-name="typescript">typescript</a>
-        </div>
-        <div class="search">
-          <input type="text" class="search" id="input-search" placeholder="Search">
-        </div>
-        <ul class="search-results"></ul>
+      <img src="images/logo-ac61b728.png" class="logo" alt="Logo" />
       <ul id="toc" class="toc-list-h1">
           <li>
             <a href="#getting-started" class="toc-h1 toc-link" data-title="Getting Started">Getting Started</a>
@@ -282,7 +275,8 @@
           </li>
       </ul>
         <ul class="toc-footer">
-            <li><a href='https://github.com/slatedocs/slate'>Documentation Powered by Slate</a></li>
+            <li>An open-source initiative</li>
+            <li>by the team from <a href='https://www.theagilemonkeys.com'>The Agile Monkeys.</a></li>
         </ul>
     </div>
     <div class="page-wrapper">
@@ -400,7 +394,7 @@ boost new:command ConfirmPayment --fields cartID:UUID confirmationToken:string
 <p>Note how no magic happened in the generator. The only thing that required for Booster to know that this class is a
 command, is the <code>@Command</code> decorator. You could get the same result by writing the class yourself 😉</p>
 
-<p>Continue reading about <a href="_04events.md">Events</a>!</p>
+<p>Continue reading about <a href="_04-events.md">Events</a>!</p>
 <h1 id='events'>Events</h1>
 <p><img src="img/booster-arch.png" alt="Booster architecture" /></p>
 
@@ -434,7 +428,7 @@ boost new:event &lt;name of the event&gt; --fields fieldName:fieldType
 
 <p>In the previous example, the <code>CartPaid</code> event has a <code>cartID</code> field, which then you will return in the <code>entityID</code> method. This allows booster to find this event when the system requests to build the state of a specific Cart.</p>
 
-<p>In most situations your event stream will be reduced to a domain model object, like that Cart (An <a href="_05entities.md">Entity</a>), but there are some use cases on which the event stream is just related to a specific entity, for example, a register of sensor values in a weather station, which are related to the station, but the station has no specific value that needs to be reduced. You can implement the semantics that best suit your needs.</p>
+<p>In most situations your event stream will be reduced to a domain model object, like that Cart (An <a href="_05-entities.md">Entity</a>), but there are some use cases on which the event stream is just related to a specific entity, for example, a register of sensor values in a weather station, which are related to the station, but the station has no specific value that needs to be reduced. You can implement the semantics that best suit your needs.</p>
 <h2 id='event-handlers'>Event Handlers</h2>
 <p>You can react to events implementing an <strong>Event Handler</strong> class. An Event Handler is a regular class that is subscribed to an event with the decorator <code>@EventHandler(&lt;name of the event class&gt;</code>. Any time that a new event is added to the event store, the <code>handle</code> method in the event handler will be called with the instance of the event and the <code>register</code> object that can be used to emit new events. Event handlers can run arbitrary code and is where it is recommended to write most of the business logic in a reactive way:</p>
 <pre class="highlight typescript tab-typescript"><code><span class="p">@</span><span class="nd">EventHandler</span><span class="p">(</span><span class="nx">CartPaid</span><span class="p">)</span>
@@ -444,13 +438,13 @@ boost new:event &lt;name of the event&gt; --fields fieldName:fieldType
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
-<p>Let&#39;s continue learning about <a href="_05entities.md">Entities</a>!</p>
+<p>Let&#39;s continue learning about <a href="_05-entities.md">Entities</a>!</p>
 <h1 id='entities'>Entities</h1>
 <p><img src="img/booster-arch.png" alt="Booster architecture" /></p>
 
 <p>Entities are not shown in the diagram because they&#39;re just a different view of the data in the events store.</p>
 
-<p>Entities represent domain model objects, that is, something that can be mapped to an object with semantics in your domain. Entities only exist conceptually, they&#39;re not explicitly stored in any database, but generated on the fly from a list of related <a href="_04events.md">events</a>.</p>
+<p>Entities represent domain model objects, that is, something that can be mapped to an object with semantics in your domain. Entities only exist conceptually, they&#39;re not explicitly stored in any database, but generated on the fly from a list of related <a href="_04-events.md">events</a>.</p>
 
 <p>Booster creates snapshots of the entities automatically under the hoods to reduce access times, but the developer doesn&#39;t has to worry about that.</p>
 
@@ -522,15 +516,15 @@ that will be triggered each time that a specific kind of event is generated.</p>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
-<p>Continue reading about <a href="_06read-models.md">Read Models</a>!</p>
+<p>Continue reading about <a href="_06-read-models.md">Read Models</a>!</p>
 <h1 id='read-models-the-read-pipeline'>Read Models - The Read Pipeline</h1>
 <p><img src="img/booster-arch.png" alt="Booster architecture" /></p>
 
-<p>Read Models are cached data optimized for read operations and they&#39;re updated reactively when <a href="_05entities.md">Entities</a> are updated by new <a href="_04events.md">events</a>. They also define the <em>Read</em> API, the available REST endpoints and their structure.</p>
+<p>Read Models are cached data optimized for read operations and they&#39;re updated reactively when <a href="_05-entities.md">Entities</a> are updated by new <a href="_04-events.md">events</a>. They also define the <em>Read</em> API, the available REST endpoints and their structure.</p>
 
 <p>Read Models are classes decorated with the <code>@ReadModel</code> decorator that have one or more projection methods. A Projection is a method decorated with the <code>@Projection</code> decorator that, given a new entity value and (optionally) a previous read model state, generate a new read model value.</p>
 
-<p>Read models can be projected from multiple <a href="_05entities.md">entities</a> as soon as they share some common key called <code>joinKey</code>.</p>
+<p>Read models can be projected from multiple <a href="_05-entities.md">entities</a> as soon as they share some common key called <code>joinKey</code>.</p>
 
 <blockquote>
 <p>TODO: (Not in the current release) To generate a Read Model you can use a read model generator. It works similarly than the entities generator:</p>
@@ -563,9 +557,9 @@ boost new:read-model CartReadModel --fields id:UUID cartItems:&quot;Array&lt;Car
 </code></pre>
 <p>Read Model classes can also be created by hand and there are no restrictions regarding the place you put the files. The structure of the data is totally open and can be as complex as you can manage in your projection functions.</p>
 
-<p>Defining a read models enables a new REST Read endpoint that you can use to query or poll the read model records <a href="_09rest-api.md">see the API documentation</a>.</p>
+<p>Defining a read models enables a new REST Read endpoint that you can use to query or poll the read model records <a href="_09-rest-api.md">see the API documentation</a>.</p>
 
-<p>Continue reading about <a href="_07auth.md">Authentication and Authorization</a>!</p>
+<p>Continue reading about <a href="_07-auth.md">Authentication and Authorization</a>!</p>
 <h1 id='authentication-and-authorization'>Authentication and Authorization</h1>
 <p>Authorization in Booster is done through roles. Every Command (and in the future, every ReadModel)
 has an <code>authorize</code> policy that tells Booster who can execute or access it. The policy is specified in the
@@ -633,7 +627,7 @@ inbox.</li>
 Bearer Authorization header (<code>Authorization: Bearer</code>). It will be used to get the user information and
 authorize it to access protected resources.</p>
 
-<p>Continue reading about <a href="_08deployment.md">how to deploy your application</a></p>
+<p>Continue reading about <a href="_08-deployment.md">how to deploy your application</a></p>
 <h1 id='deploying'>Deploying</h1>
 <p>One of the goals of Booster is to become provider agnostic so you can deploy your application to any serverless provider like AWS, Google Cloud, Azure, etc...</p>
 
@@ -671,10 +665,10 @@ boost nuke
 <p><strong>Note</strong>: This will delete everything in your stack, including databases. This action is <strong>not</strong> reversible!</p>
 </blockquote>
 
-<p>After deploying your application, check out <a href="_09rest-api.md">the API documentation to start using it</a>!</p>
+<p>After deploying your application, check out <a href="_09-rest-api.md">the API documentation to start using it</a>!</p>
 <h1 id='booster-cloud-framework-rest-api'>Booster Cloud Framework REST API</h1>
-<p>The API for a Booster application is very simple and is fully defined by auth endpoints and the <a href="_03commands.md">commands</a>
-and <a href="_06read-models.md">read models</a> names and structures.</p>
+<p>The API for a Booster application is very simple and is fully defined by auth endpoints and the <a href="_03-commands.md">commands</a>
+and <a href="_06-read-models.md">read models</a> names and structures.</p>
 
 <p>After a successful deployment you&#39;ll see an &quot;Outputs:&quot; section in your terminal with several values that you need to use
 when doing requests to the API. Those values are:</p>
@@ -687,7 +681,7 @@ when doing requests to the API. Those values are:</p>
 <p>Note that the <code>Content-Type</code> for all requests is <code>application/json</code>.</p>
 <h2 id='authentication-and-authorization-api'>Authentication and Authorization API</h2>
 <p>The following endpoints are provisioned if your application have at least one role defined. For more information about how
-to use roles to restrict the access to your application, see the section <a href="_07auth.md">Authentication and Authorization</a>.</p>
+to use roles to restrict the access to your application, see the section <a href="_07-auth.md">Authentication and Authorization</a>.</p>
 <h3 id='sign-up'>Sign-up</h3>
 <p>Register a user in your application. After a successful invocation, an email will be sent to the user&#39;s inbox
 with a confirmation link. <strong>Users&#39;s won&#39;t be able to sign-in before they click in that link</strong>.</p>
@@ -835,9 +829,6 @@ the one generated for your application, you will get this error.  </p>
 
       </div>
       <div class="dark-box">
-          <div class="lang-selector">
-                <a href="#" data-language-name="typescript">typescript</a>
-          </div>
       </div>
     </div>
   </body>
