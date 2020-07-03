@@ -218,6 +218,18 @@ export async function baseWebsocketURL(): Promise<string> {
   return url
 }
 
+export async function staticWebsiteURL(): Promise<string> {
+  const { Outputs } = await appStack()
+  const url = Outputs?.find((output) => {
+    return output.OutputKey === 'staticWebsiteURL'
+  })?.OutputValue
+
+  if (!url) {
+    throw 'Unable to get the static website URL from the current stack'
+  }
+  return url
+}
+
 export async function signUpURL(): Promise<string> {
   return new URL('auth/sign-up', await baseHTTPURL()).href
 }

@@ -4,6 +4,8 @@ export const readFileContent = (filePath: string): string => fs.readFileSync(fil
 
 export const writeFileContent = (filePath: string, data: any): void => fs.writeFileSync(filePath, data)
 
+export const createFolders = (folderPath: string): Promise<string> => fs.promises.mkdir(folderPath, { recursive: true })
+
 export const removeFiles = (filePaths: Array<string>): Array<Promise<void>> => {
   return filePaths.map((file: string) => {
     return new Promise((resolve) => {

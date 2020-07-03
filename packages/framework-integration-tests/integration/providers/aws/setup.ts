@@ -2,13 +2,21 @@ import util = require('util')
 const exec = util.promisify(require('child_process').exec)
 import { deploy, nuke } from '../../../src/deploy'
 import { config } from 'aws-sdk'
+import { createFolders, readFileContent, removeFiles, removeFolders, writeFileContent } from '../../helper/fileHelper'
+
+const removeStaticSite = () => {
+  console.log('Removing static site...')
+  return Promise.all([...removeFiles(['public/index.html']), ...removeFolders(['public/'])])
+}
 
 before(async () => {
   await setEnv()
+  await setStaticSite()
   await checkConfigAnd(deploy)
 })
 
 after(async () => {
+  await removeStaticSite()
   if (!process.env['FULL_INTEGRATION_TEST']) {
     await checkConfigAnd(nuke)
   }
@@ -29,6 +37,15 @@ async function setEnv(): Promise<void> {
   // AWS_REGION to our chosen region to make this thing work...
   process.env['AWS_SDK_LOAD_CONFIG'] = 'true'
   console.log('setting AWS_SDK_LOAD_CONFIG=' + process.env.AWS_SDK_LOAD_CONFIG)
+}
+
+// This will overwrite the public/index.html file of the test project if it exists
+async function setStaticSite(): Promise<void> {
+  console.log('Adding static site...')
+  const indexPageContent = await readFileContent('integration/fixtures/cart-demo/public/index.html')
+
+  await createFolders('public/')
+  await writeFileContent('public/index.html', indexPageContent)
 }
 
 async function checkConfigAnd(action: () => Promise<void>): Promise<void> {
