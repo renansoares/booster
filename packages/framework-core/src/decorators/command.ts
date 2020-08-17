@@ -38,7 +38,7 @@ export function CommandHandler<TResult>(
   })
 }
 
-function assertCommandIsRegistered(config: BoosterConfig, commandClass: Class<CommandInterface>) {
+function assertCommandIsRegistered(config: BoosterConfig, commandClass: Class<CommandInterface>): void {
   if (!config.commandAttributes[commandClass.name]) {
     throw new Error(`No command named ${commandClass.name} was registered.
 Fix this by decorating the class acting as a command with the @Command decorator and specify the roles
