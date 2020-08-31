@@ -52,4 +52,5 @@ const generateType = (info: TypeInfo): Promise<void> =>
       imports: [],
       ...info,
     },
+      append: false
   })

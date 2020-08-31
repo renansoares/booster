@@ -93,4 +93,5 @@ const generateEntity = (info: EntityInfo): Promise<void> =>
       imports: generateImports(info),
       ...info,
     },
+    append: false
   })

@@ -79,4 +79,5 @@ const generateCommand = (info: CommandInfo): Promise<void> =>
       imports: generateImports(info),
       ...info,
     },
+    append: false
   })

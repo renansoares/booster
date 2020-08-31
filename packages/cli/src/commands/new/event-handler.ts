@@ -77,4 +77,5 @@ const generateEventHandler = (info: EventHandlerInfo): Promise<void> =>
       imports: generateImports(info),
       ...info,
     },
+    append: false
   })

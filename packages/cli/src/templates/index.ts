@@ -5,6 +5,7 @@ import * as Type from './type'
 import * as Project from './project'
 import * as ReadModel from './read-model'
 import * as EventHandler from './event-handler'
+import * as Role from './role'
 
 export const templates = {
   command: Command.template,
@@ -14,4 +15,5 @@ export const templates = {
   type: Type.template,
   project: Project.templates,
   readModel: ReadModel.template,
+  roles: Role.template,
 }

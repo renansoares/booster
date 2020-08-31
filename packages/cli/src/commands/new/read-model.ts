@@ -94,4 +94,5 @@ const generateReadModel = (info: ReadModelInfo): Promise<void> =>
       imports: generateImports(info),
       ...info,
     },
+    append: false
   })

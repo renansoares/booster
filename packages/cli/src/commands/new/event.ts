@@ -71,4 +71,5 @@ const generateEvent = (info: EventInfo): Promise<void> =>
       imports: generateImports(),
       ...info,
     },
+    append: false,
   })

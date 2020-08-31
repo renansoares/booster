@@ -6,5 +6,6 @@ export interface Target<TInfo> {
   extension: string
   placementDir: string
   template: string
-  info: TInfo
+  info: TInfo,
+  append: boolean
 }
