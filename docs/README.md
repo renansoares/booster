@@ -1411,12 +1411,12 @@ export class UpdateUser {
 
 By default, a Booster application has no roles defined, so the only allowed value you can use in the `authorize` policy is `'all'` (good for public APIs).
 If you want to add user authorization, you first need to create the roles that are suitable for your application.
-Roles are classes annotated with the `@Role` decorator, where you can specify some attributes. We recommend that you define your roles in the file `src/roles.ts` or, if you have too many roles, put them in several files under the `src/roles` folder.
+Roles are classes annotated with the `@Role` decorator, where you can specify some attributes. We recommend that you define your roles in the file `src/role.ts` or, if you have too many roles, put them in several files under the `src/roles` folder.
 
 In the following example we define two roles, `Admin` and `User`:
 
 ```typescript
-// src/roles.ts
+// src/role.ts
 
 @Role({
   auth: {
