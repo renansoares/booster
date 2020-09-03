@@ -3,10 +3,11 @@ import {
   MigrationMetadata,
   EntityMetadata,
   RoleMetadata,
-  CommandMetadata,
+  CommandHandlerMetadata,
   ProjectionMetadata,
   ReadModelMetadata,
   EventHandlerInterface,
+  RoleAccess,
 } from './concepts'
 import { ProviderLibrary } from './provider'
 import { Level } from './logger'
@@ -32,7 +33,8 @@ export class BoosterConfig {
 
   public readonly entities: Record<EntityName, EntityMetadata> = {}
   public readonly reducers: Record<EventName, ReducerMetadata> = {}
-  public readonly commandHandlers: Record<CommandName, CommandMetadata> = {}
+  public readonly commandAttributes: Record<CommandName, RoleAccess> = {}
+  public readonly commandHandlers: Record<CommandName, CommandHandlerMetadata> = {}
   public readonly eventHandlers: Record<EventName, Array<EventHandlerInterface>> = {}
   public readonly readModels: Record<ReadModelName, ReadModelMetadata> = {}
   public readonly projections: Record<EntityName, Array<ProjectionMetadata>> = {}

@@ -20,12 +20,13 @@ export class BoosterCommandDispatcher {
       throw new InvalidParameterError('The required command "version" was not present')
     }
 
+    const commandAttributes = this.config.commandAttributes[commandEnvelope.typeName]
     const commandMetadata = this.config.commandHandlers[commandEnvelope.typeName]
     if (!commandMetadata) {
       throw new NotFoundError(`Could not find a proper handler for ${commandEnvelope.typeName}`)
     }
 
-    if (!BoosterAuth.isUserAuthorized(commandMetadata.authorizedRoles, commandEnvelope.currentUser)) {
+    if (!BoosterAuth.isUserAuthorized(commandAttributes.authorize, commandEnvelope.currentUser)) {
       throw new NotAuthorizedError(`Access denied for command '${commandEnvelope.typeName}'`)
     }
 

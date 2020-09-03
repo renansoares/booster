@@ -1,13 +1,14 @@
-import { PropertyMetadata, Class, AnyClass } from '@boostercloud/framework-types'
+import { ReturnTypeMetadata, PropertyMetadata, Class, AnyClass } from '@boostercloud/framework-types'
 import 'reflect-metadata'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function getPropertiesMetadata(classType: Class<any>): Array<PropertyMetadata> {
+export function getPropertiesMetadata(classType: Class<unknown>): Array<PropertyMetadata> {
   const propertyNames = Object.getOwnPropertyNames(new classType())
   const propertyTypes = Reflect.getMetadata('design:paramtypes', classType)
   if (propertyNames.length != propertyTypes.length) {
     // eslint-disable-next-line prettier/prettier
-    throw new Error(`Could not get proper metadata information of ${classType.name}. While inspecting the class, the following properties were found:
+    throw new Error(`Could not get proper metadata information of ${
+      classType.name
+    }. While inspecting the class, the following properties were found:
 > ${propertyNames.join(', ')}
 But its constructor parameters have the following types:
 > ${propertyTypes.map((type: AnyClass) => type.name).join(', ')}
@@ -19,4 +20,11 @@ They mismatch. Make sure you define all properties as "constructor parameter pro
     name: propertyName,
     type: propertyTypes[index],
   }))
+}
+
+/**
+ * Extracts the return type metadata from the TypeScript decorator metadata `design:returntype` key
+ */
+export function getReturnTypeMetadata(method: Class<unknown>): ReturnTypeMetadata {
+  return Reflect.getMetadata('design:returntype', method)[0]
 }
