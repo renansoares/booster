@@ -16,6 +16,9 @@ describe('the `BoosterCommandsDispatcher`', () => {
       for (const propName in config.commandHandlers) {
         delete config.commandHandlers[propName]
       }
+      for (const propName in config.commandAttributes) {
+        delete config.commandAttributes[propName]
+      }
     })
   })
 
