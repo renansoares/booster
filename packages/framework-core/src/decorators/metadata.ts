@@ -25,6 +25,18 @@ They mismatch. Make sure you define all properties as "constructor parameter pro
 /**
  * Extracts the return type metadata from the TypeScript decorator metadata `design:returntype` key
  */
+export function getParametersMetadata(method: Class<unknown>): Array<PropertyMetadata> {
+  return Reflect.getMetadata('design:paramtypes', method)
+}
+
+/**
+ * Extracts the return type metadata from the TypeScript decorator metadata `design:returntype` key
+ */
 export function getReturnTypeMetadata(method: Class<unknown>): ReturnTypeMetadata {
-  return Reflect.getMetadata('design:returntype', method)[0]
+  const result = Reflect.getMetadata('design:returntype', method)
+  if (!result) {
+    console.error(method)
+    throw Error('Metadata arrived empty')
+  }
+  return result
 }

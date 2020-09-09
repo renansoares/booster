@@ -5,7 +5,7 @@ import { fake, replace, restore, match } from 'sinon'
 import { expect } from './expect'
 import { BoosterCommandDispatcher } from '../src/booster-command-dispatcher'
 import { Logger, Register } from '@boostercloud/framework-types'
-import { Command } from '../src/decorators'
+import { Command, CommandHandler } from '../src/decorators'
 import { RegisterHandler } from '../src/booster-register-handler'
 
 describe('the `BoosterCommandsDispatcher`', () => {
@@ -35,6 +35,7 @@ describe('the `BoosterCommandsDispatcher`', () => {
         class PostComment {
           public constructor(readonly comment: string) {}
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          @CommandHandler
           public static async handle(_command: PostComment, _register: Register): Promise<void> {
             throw new Error('Not implemented')
           }

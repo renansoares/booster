@@ -1,11 +1,10 @@
 import { Booster } from '../booster'
-import { Class, CommandInterface, RoleAccess, Register, BoosterConfig } from '@boostercloud/framework-types'
-import { getPropertiesMetadata, getReturnTypeMetadata } from './metadata'
+import { Class, CommandInterface, RoleAccess, Register } from '@boostercloud/framework-types'
+import { getReturnTypeMetadata, getParametersMetadata } from './metadata'
 
 /**
  * Decorator to tell Booster which classes are your commands
  * @param attributes
- * @constructor
  */
 export function Command(attributes: RoleAccess): <TCommand>(commandClass: CommandInterface<TCommand>) => void {
   return (commandClass) => {
@@ -23,36 +22,21 @@ export function Command(attributes: RoleAccess): <TCommand>(commandClass: Comman
  * Decorator to tell Booster which method is in charge of handling the command
  */
 export function CommandHandler<TResult>(
-  commandClass: Class<CommandInterface>,
-  methodName: string,
-  methodDescriptor: CommandHandlerMethod<CommandInterface, TResult>
+  commandClass: CommandInterface,
+  _methodName: string,
+  methodDescriptor: CommandHandlerMethod<TResult>
 ): void {
   const method = methodDescriptor as Class<unknown>
   Booster.configureCurrentEnv((config): void => {
-    assertCommandIsRegistered(config, commandClass)
     config.commandHandlers[commandClass.name] = {
       class: commandClass,
-      properties: getPropertiesMetadata(method),
+      properties: getParametersMetadata(method),
       returnType: getReturnTypeMetadata(method),
     }
   })
 }
 
-function assertCommandIsRegistered(config: BoosterConfig, commandClass: Class<CommandInterface>): void {
-  if (!config.commandAttributes[commandClass.name]) {
-    throw new Error(`No command named ${commandClass.name} was registered.
-Fix this by decorating the class acting as a command with the @Command decorator and specify the roles
-authorized to execute it.
-
-Example:
-
-@Command({
-  authorize: 'all'
-})
-export class My Command {
-  ...
-`)
-  }
-}
-
-type CommandHandlerMethod<TCommand, TResult> = TypedPropertyDescriptor<(_: TCommand, register: Register) => TResult>
+// TL;DR: Allowing `any` here because `TypedPropertyDescriptor` is very
+// exquisite regarding the type of the function, and we cannot use `unknown`
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type CommandHandlerMethod<TResult> = TypedPropertyDescriptor<(command: any, register: Register) => Promise<TResult>>

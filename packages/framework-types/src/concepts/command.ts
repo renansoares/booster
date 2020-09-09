@@ -1,7 +1,4 @@
 import { Register } from './register'
-import { PropertyMetadata, Class } from '../typelevel'
-import { RoleAccess } from './role'
-import { Class, PropertyMetadata, AnyClass } from '../typelevel'
 import { Class, PropertyMetadata, ReturnTypeMetadata } from '../typelevel'
 
 export interface CommandInterface<TCommand = unknown> extends Class<TCommand> {
@@ -12,7 +9,7 @@ export interface CommandInterface<TCommand = unknown> extends Class<TCommand> {
 }
 
 export interface CommandHandlerMetadata {
-  readonly class: Class<CommandInterface>
+  readonly class: CommandInterface
   readonly properties: Array<PropertyMetadata>
   readonly returnType: ReturnTypeMetadata
 }
