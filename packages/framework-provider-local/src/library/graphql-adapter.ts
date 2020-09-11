@@ -16,7 +16,7 @@ export async function rawGraphQLRequestToEnvelope(
       connectionID,
       currentUser: {
         username: 'test@test.com',
-        role: '',
+        role: 'UserWithEmail',
       },
       value: request.body,
     }

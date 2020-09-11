@@ -37,6 +37,7 @@ export class ReadModelStore {
         const entitySnapshot = entitySnapshotEnvelope.value as EntityInterface
         const readModelID = this.joinKeyForProjection(entitySnapshot, projectionMetadata)
         const readModel = await this.fetchReadModel(readModelName, readModelID)
+
         this.logger.debug(
           '[ReadModelStore#project] Projecting entity snapshot ',
           entitySnapshotEnvelope,

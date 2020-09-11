@@ -7,16 +7,18 @@ import {
   storeEvents,
 } from './library/events-adapter'
 import { requestSucceeded, requestFailed } from './library/api-adapter'
-import { EventRegistry } from './services'
+import { EventRegistry, ReadModelRegistry } from './services'
 import { rawGraphQLRequestToEnvelope } from './library/graphql-adapter'
 import { UserApp } from '@boostercloud/framework-types'
 import * as path from 'path'
+import { fetchReadModel, storeReadModel } from './library/read-model-adapter'
 
 export { User, LoginCredentials, SignUpUser, RegisteredUser, AuthenticatedUser } from './library/auth-adapter'
 export * from './paths'
 export * from './services'
 
 const eventRegistry = new EventRegistry()
+const readModelRegistry = new ReadModelRegistry()
 const userApp: UserApp = require(path.join(process.cwd(), 'dist', 'index.js'))
 
 export const Provider: ProviderLibrary = {
@@ -31,13 +33,10 @@ export const Provider: ProviderLibrary = {
   readModels: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     rawToEnvelopes: undefined as any,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    fetch: undefined as any,
+    fetch: fetchReadModel.bind(null, readModelRegistry),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     search: undefined as any,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    store: undefined as any,
+    store: storeReadModel.bind(null, readModelRegistry),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     subscribe: undefined as any,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

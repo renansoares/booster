@@ -68,7 +68,6 @@ export async function storeEvents(
   logger: Logger
 ): Promise<void> {
   logger.info('Publishing the following events:', eventEnvelopes)
-
   for (const event of eventEnvelopes) {
     await eventRegistry.store(event)
   }
