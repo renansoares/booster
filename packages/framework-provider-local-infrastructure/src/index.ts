@@ -1,12 +1,11 @@
 import * as express from 'express'
-import { GraphQLService, readModelDatabase, UserRegistry } from '@boostercloud/framework-provider-local'
+import { GraphQLService, UserRegistry } from '@boostercloud/framework-provider-local'
 import { AuthController } from './controllers/auth'
 import { BoosterConfig } from '@boostercloud/framework-types'
 import path = require('path')
 import { requestFailed } from './http'
 import { GraphQLController } from './controllers/graphql'
 import { UserApp } from '@boostercloud/framework-types'
-import * as fs from 'fs'
 
 /**
  * Default error handling middleware. Instead of performing a try/catch in all endpoints
@@ -38,12 +37,6 @@ export const Infrastructure = {
     const expressServer = express()
     const router = express.Router()
     const userProject: UserApp = require(path.join(process.cwd(), 'dist', 'index.js'))
-    Object.keys(config.readModels).map((readModelName: string) => {
-      const filePath = readModelDatabase(readModelName)
-      if (!fs.existsSync(filePath)) {
-        fs.writeFileSync(readModelDatabase(readModelName), '')
-      }
-    })
     const userRegistry = new UserRegistry()
     const graphQLService = new GraphQLService(userProject)
     router.use('/auth', new AuthController(port, userRegistry, userProject).router)
