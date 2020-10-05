@@ -20,6 +20,7 @@ export class ProductReadModel {
     readonly price?: Money
   ) {}
 
+  // @Concept("Projection", Product, 'id')
   @Projects(Product, 'id')
   public static updateWithProduct(product: Product): ProductReadModel {
     if (product.deleted) {
