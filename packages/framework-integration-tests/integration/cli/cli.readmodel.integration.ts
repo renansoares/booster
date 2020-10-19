@@ -12,10 +12,13 @@ const FILE_CART_READ_MODEL = 'src/read-models/cart-read-model.ts'
 const FILE_CART_WITH_FIELDS_READ_MODEL = 'src/read-models/cart-with-fields-read-model.ts'
 const FILE_CART_WITH_PROJECTION_READ_MODEL = 'src/read-models/cart-with-projection-read-model.ts'
 
-export const CLI_READ_MODEL_INTEGRATION_TEST_FILES: Array<string> = [
-  FILE_CART_READ_MODEL,
+export const CLI_READ_MODEL_INTEGRATION_TEST_FILES_TO_DELETE: Array<string> = [
   FILE_CART_WITH_FIELDS_READ_MODEL,
   FILE_CART_WITH_PROJECTION_READ_MODEL,
+]
+export const CLI_READ_MODEL_INTEGRATION_TEST_FILES: Array<string> = [
+  FILE_CART_READ_MODEL,
+  ...CLI_READ_MODEL_INTEGRATION_TEST_FILES_TO_DELETE,
 ]
 describe('Read model', () => {
   const cliPath = path.join('..', 'cli', 'bin', 'run')

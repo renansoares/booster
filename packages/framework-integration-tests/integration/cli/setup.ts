@@ -5,7 +5,7 @@ import { CLI_ENTITY_INTEGRATION_TEST_FILES } from './cli.entity.integration'
 import { CLI_COMMAND_INTEGRATION_TEST_FILES } from './cli.command.integration'
 import { CLI_TYPE_INTEGRATION_TEST_FILES } from './cli.type.integration'
 import { CLI_EVENTS_INTEGRATION_TEST_FILES } from './cli.event.integration'
-import { CLI_READ_MODEL_INTEGRATION_TEST_FILES } from './cli.readmodel.integration'
+import { CLI_READ_MODEL_INTEGRATION_TEST_FILES_TO_DELETE } from './cli.readmodel.integration'
 import { CLI_PROJECT_INTEGRATION_TEST_FOLDERS } from './cli.project.integration'
 import { CLI_EVENT_HANDLERS_INTEGRATION_TEST_FILES } from './cli.event-handler.integration'
 import { CLI_SCHEDULED_COMMAND_INTEGRATION_TEST_FILES } from './cli.scheduled-command.integration'
@@ -17,7 +17,7 @@ const testFiles: Array<string> = [
   ...CLI_COMMAND_INTEGRATION_TEST_FILES,
   ...CLI_TYPE_INTEGRATION_TEST_FILES,
   ...CLI_EVENTS_INTEGRATION_TEST_FILES,
-  ...CLI_READ_MODEL_INTEGRATION_TEST_FILES,
+  ...CLI_READ_MODEL_INTEGRATION_TEST_FILES_TO_DELETE,
   ...CLI_EVENT_HANDLERS_INTEGRATION_TEST_FILES,
   ...CLI_SCHEDULED_COMMAND_INTEGRATION_TEST_FILES,
 ]
