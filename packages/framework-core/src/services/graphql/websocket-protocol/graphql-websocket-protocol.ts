@@ -109,7 +109,7 @@ export class GraphQLWebsocketHandler {
       )
       return
     }
-    const augmentedEnvelope = await this.augmentEnvelope(connectionID, envelope, message)
+    const augmentedEnvelope = await this.augmentEnvelope(envelope, message)
 
     this.logger.debug('Executing operation. Envelope: ', augmentedEnvelope)
     const result = await this.callbacks.onStartOperation(augmentedEnvelope)
@@ -126,15 +126,11 @@ export class GraphQLWebsocketHandler {
   }
 
   private async augmentEnvelope(
-    connectionID: string,
     envelope: GraphQLRequestEnvelope,
     message: GraphQLStart
   ): Promise<GraphQLRequestEnvelope> {
-    const connectionData = await this.connectionManager.fetchData(this.config, connectionID)
-    this.logger.debug('Found connection data: ', connectionData)
     return {
       ...envelope,
-      currentUser: connectionData?.user,
       value: {
         ...message.payload,
         id: message.id,
