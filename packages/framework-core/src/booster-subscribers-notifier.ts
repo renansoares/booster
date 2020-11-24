@@ -42,7 +42,7 @@ export class BoosterSubscribersNotifier {
       const pubSub = this.getPubSub(readModelEnvelopes)
       await Promise.all(
         subscriptions.map((subscription) => {
-          this.runSubscriptionAndNotify(pubSub, subscription).catch((e) => this.logger(e))
+          this.runSubscriptionAndNotify(pubSub, subscription).catch((e) => this.logger.error(e))
         })
       )
     } catch (e) {
@@ -120,7 +120,7 @@ export class BoosterSubscribersNotifier {
   ): Promise<unknown> {
     const notificationPromises: Array<Promise<void>> = []
     for await (const result of iterator) {
-      notificationPromises.push(this.notifyWithGraphQLResult(subscription, result).catch((e) => this.logger(e)))
+      notificationPromises.push(this.notifyWithGraphQLResult(subscription, result).catch((e) => this.logger.error(e)))
     }
     return Promise.all(notificationPromises)
   }
