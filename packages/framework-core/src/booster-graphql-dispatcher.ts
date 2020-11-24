@@ -186,8 +186,12 @@ export class BoosterGraphQLDispatcher {
       return
     }
     this.logger.debug('Deleting all subscriptions and connection data')
-    await this.config.provider.connections.deleteData(this.config, connectionID)
-    await this.readModelDispatcher.unsubscribeAll(connectionID)
+    try {
+      await this.config.provider.connections.deleteData(this.config, connectionID)
+      await this.readModelDispatcher.unsubscribeAll(connectionID)
+    } catch (e) {
+      this.logger.error(e)
+    }
   }
 }
 
