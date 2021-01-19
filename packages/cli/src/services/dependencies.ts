@@ -3,7 +3,7 @@ import { wrapExecError } from '../common/errors'
 
 export async function pruneDevDependencies(): Promise<void> {
   try {
-    await exec('npm install --production --no-bin-links')
+    await exec('npm prune --production')
   } catch (e) {
     throw wrapExecError(e, 'Could not prune dev dependencies')
   }
