@@ -1,5 +1,5 @@
 import { Command, flags } from '@oclif/command'
-import { deployToCloudProvider } from '../services/provider-service'
+import { deployToCloudProvider, postDeployProvider } from '../services/provider-service'
 import {
   cleanDeploymentSandbox,
   compileProjectAndLoadConfig,
@@ -13,12 +13,15 @@ import { currentEnvironment, initializeEnvironment } from '../services/environme
 
 const runTasks = async (
   compileAndLoad: Promise<BoosterConfig>,
-  deployer: (config: BoosterConfig, logger: Logger) => Promise<void>
+  deployer: (config: BoosterConfig, logger: Logger) => Promise<void>,
+  postDeployer: (config: BoosterConfig, logger: Logger) => Promise<void>
 ): Promise<void> =>
   Script.init(`boost ${Brand.dangerize('deploy')} [${currentEnvironment()}] 🚀`, compileAndLoad)
     .step('Deploying', (config) => deployer(config, logger))
     .step('Cleaning up deployment files', cleanDeploymentSandbox)
     .info('Deployment complete!')
+    .step('Running post deployment actions', (config: BoosterConfig) => postDeployer(config, logger))
+    .info('Post deployment actions finished!')
     .done()
 
 export default class Deploy extends Command {
@@ -37,7 +40,7 @@ export default class Deploy extends Command {
 
     if (initializeEnvironment(logger, flags.environment)) {
       const deploymentProjectPath = await createDeploymentSandbox()
-      await runTasks(compileProjectAndLoadConfig(deploymentProjectPath), deployToCloudProvider)
+      await runTasks(compileProjectAndLoadConfig(deploymentProjectPath), deployToCloudProvider, postDeployProvider)
     }
   }
 }
