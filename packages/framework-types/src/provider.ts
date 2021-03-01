@@ -93,7 +93,6 @@ export interface ProviderAPIHandling {
 
 export interface ProviderInfrastructure {
   deploy?: (configuration: BoosterConfig, logger: Logger) => Promise<void>
-  postDeploy?: (configuration: BoosterConfig, logger: Logger) => Promise<void>
   nuke?: (configuration: BoosterConfig, logger: Logger) => Promise<void>
   start?: (configuration: BoosterConfig, port: number) => Promise<void>
 }

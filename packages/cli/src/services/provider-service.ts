@@ -24,10 +24,7 @@ export function assertNameIsCorrect(name: string): void {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function supportedInfrastructureMethodOrDie(
-  methodName: 'deploy' | 'postDeploy' | 'nuke' | 'start',
-  config: BoosterConfig
-): any {
+function supportedInfrastructureMethodOrDie(methodName: 'deploy' | 'nuke' | 'start', config: BoosterConfig): any {
   assertNameIsCorrect(config.appName)
   const method = config.provider.infrastructure()[methodName]
   if (!method) {
@@ -40,10 +37,6 @@ function supportedInfrastructureMethodOrDie(
 
 export function deployToCloudProvider(config: BoosterConfig, logger: Logger): Promise<void> {
   return supportedInfrastructureMethodOrDie('deploy', config)(config, logger)
-}
-
-export function postDeployProvider(config: BoosterConfig, logger: Logger): Promise<void> {
-  return supportedInfrastructureMethodOrDie('postDeploy', config)(config, logger)
 }
 
 export function nukeCloudProviderResources(config: BoosterConfig, logger: Logger): Promise<void> {

@@ -1,6 +1,6 @@
 import { ProviderInfrastructure, RocketDescriptor, BoosterConfig, Logger } from '@boostercloud/framework-types'
 import { loadRocket } from './rockets/infrastructure-rocket'
-import { deploy, postDeploy, nuke } from './infrastructure'
+import { deploy, nuke } from './infrastructure'
 
 export { InfrastructureRocket } from './rockets/infrastructure-rocket'
 export { RocketUtils } from './rockets/rocket-utils'
@@ -11,13 +11,6 @@ export const Infrastructure = (rocketDescriptors?: RocketDescriptor[]): Provider
     deploy: async (config: BoosterConfig, logger: Logger) => {
       try {
         await deploy(config, logger, rockets)
-      } catch (error) {
-        logger.error(error)
-      }
-    },
-    postDeploy: async (config: BoosterConfig, logger: Logger) => {
-      try {
-        await postDeploy(config, logger)
       } catch (error) {
         logger.error(error)
       }
